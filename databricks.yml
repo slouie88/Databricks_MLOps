@@ -13,8 +13,8 @@ targets:
       host: https://dbc-95e5cd53-4acb.cloud.databricks.com/
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.target}/${bundle.name}
       profile: databricks_mlops
-    variables:
-      schedule_pause_status: PAUSED
+    # variables:
+    #   schedule_pause_status: PAUSED
 
   test:
     presets:
@@ -23,8 +23,8 @@ targets:
       host: https://dbc-95e5cd53-4acb.cloud.databricks.com/
       root_path: /Shared/.bundle/${bundle.target}/${bundle.name}
       profile: databricks_mlops
-    variables:
-      schedule_pause_status: PAUSED
+    # variables:
+    #   schedule_pause_status: PAUSED
 
   prod:
     mode: production
@@ -32,5 +32,5 @@ targets:
       host: https://dbc-95e5cd53-4acb.cloud.databricks.com/
       root_path: /Shared/.bundle/${bundle.target}/${bundle.name}
       profile: databricks_mlops
-    variables:
-      schedule_pause_status: PAUSED # normally UNPAUSED
+    # variables:
+    #   schedule_pause_status: PAUSED # normally UNPAUSED
