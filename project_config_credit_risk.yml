@@ -1,0 +1,23 @@
+prod:
+  catalog_name: mlops_prod
+  schema_name: marvel_characters
+test:
+  catalog_name: mlops_test
+  schema_name: marvel_characters
+dev:
+  catalog_name: mlops_dev
+  schema_name: marvel_characters
+
+primary_keys:
+  - CustomerId
+
+
+experiment_name_basic: /Shared/credit-risk-basic
+experiment_name_custom: /Shared/credit-risk-custom
+
+learning_parameters:
+  learning_rate: 0.01
+  n_estimators: 1000
+  max_depth: 6
+
+target: Risk

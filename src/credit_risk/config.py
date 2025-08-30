@@ -10,12 +10,11 @@ class Config(BaseModel):
     Supports environment-specific configuration overrides.
     """
 
-    numerical_features: list[str]
-    categorical_features: list[str]
     target: str
     catalog_name: str
     schema_name: str
-    parameters: dict[str, Any]
+    primary_keys: list[str]
+    learning_parameters: dict[str, Any]
     experiment_name_basic: str | None
     experiment_name_custom: str | None
 

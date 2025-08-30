@@ -24,7 +24,7 @@ class DataExtractor:
         :param pd_df: Input pandas DataFrame to be written to feature table
         """
         # Convert pandas DataFrame to Spark DataFrame
-        spark_df = self.spark.createDataFrame(self.pd_df)
+        spark_df = self.spark.createDataFrame(pd_df)
 
         # Write to Unity Catalog Feature Table using Databricks 
         table_name = f"{self.config.catalog_name}.{self.config.schema_name}.credit_risk"
@@ -36,7 +36,7 @@ class DataExtractor:
         )
 
         # Enforce primary key constraint on id column to ensure table is a feature table in unity catalog
-        primary_keys = self.config.paramaters["primary_keys"]
+        primary_keys = self.config.primary_keys
         for key in primary_keys:
             self.spark.sql(f"ALTER TABLE {table_name} ALTER COLUMN {key} SET NOT NULL")
         self.spark.sql(f"ALTER TABLE {table_name} ADD CONSTRAINT pk_{table_name.split('.')[-1]} PRIMARY KEY ({', '.join(primary_keys)})")
