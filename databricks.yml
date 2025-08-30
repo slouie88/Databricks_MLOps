@@ -16,9 +16,9 @@ targets:
     variables:
       schedule_pause_status: PAUSED
 
-  acc:
+  test:
     presets:
-      name_prefix: 'acc_'
+      name_prefix: 'test_'
     workspace:
       host: https://dbc-95e5cd53-4acb.cloud.databricks.com/
       root_path: /Shared/.bundle/${bundle.target}/${bundle.name}
@@ -26,7 +26,7 @@ targets:
     variables:
       schedule_pause_status: PAUSED
 
-  prd:
+  prod:
     mode: production
     workspace:
       host: https://dbc-95e5cd53-4acb.cloud.databricks.com/
