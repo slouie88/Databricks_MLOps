@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    deployment:
+      name: data-extraction-workflow
+      schedule:
+        quartz_cron_expression: 27 0 8 * * ?
+        timezone_id: Australia/Brisbane
+        pause_status: ${var.schedule_pause_status}
+      tags:
+        project_name: "credit-risk"
+
+      environments:
+        - environment_key: default
+          spec:
+            # client: "3"
+            environment_version: "3"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: "extraction"
+          environment_key: default
+          spark_python_task:
+            python_file: "../scripts/extract_data.py"
+            parameters:
+              - "--root_path"
+              - "${workspace.root_path}"
+              - "--env"
+              - "${bundle.target}"
