@@ -1,12 +1,12 @@
 prod:
   catalog_name: mlops_prod
-  schema_name: marvel_characters
+  schema_name: credit_risk
 test:
   catalog_name: mlops_test
-  schema_name: marvel_characters
+  schema_name: credit_risk
 dev:
   catalog_name: mlops_dev
-  schema_name: marvel_characters
+  schema_name: credit_risk
 
 primary_keys:
   - CustomerId
