@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %pip install -e ..
+# MAGIC %restart_python
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Import Packages
 
