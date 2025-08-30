@@ -38,6 +38,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where =["src"]
+include = ["credit_risk*"]
 
 [tool.setuptools.dynamic]
 version = { file = "version.txt" }

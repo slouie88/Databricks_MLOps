@@ -26,7 +26,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-project_config_yml_filename = "project_config_credit_risk.yml"  # Placeholder this with target project_config yaml file. If multiple projects in src, then pass the appropriate projdect_config yaml file.
+project_config_yml_filename = "project_config_credit_risk.yml" 
 config_path = f"{args.root_path}/files/{project_config_yml_filename}"
 config = Config.from_yaml(config_path=config_path, env=args.env)
 
