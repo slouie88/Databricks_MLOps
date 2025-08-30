@@ -12,8 +12,7 @@ resources:
       environments:
         - environment_key: default
           spec:
-            # client: "3"
-            environment_version: "3"
+            client: "3"
             dependencies:
               - ../dist/*.whl
 
