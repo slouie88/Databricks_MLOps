@@ -30,7 +30,7 @@ from credit_risk.data_extractor import DataExtractor
 # COMMAND ----------
 
 project_config_yml_filename = "project_config_credit_risk.yml" 
-full_config_dir_path = "/Workspace/Users/slouie16888@gmail.com/Databricks_MLOps"
+full_config_dir_path = ".."
 
 config_path = f"{full_config_dir_path}/{project_config_yml_filename}"
 config = Config.from_yaml(config_path=config_path, env="dev")
@@ -49,7 +49,7 @@ logger.info(yaml.dump(config, default_flow_style=False))
 spark = SparkSession.builder.getOrCreate()
 
 csv_data_filename = "german_credit_data.csv"
-full_data_dir_path = "/Workspace/Users/slouie16888@gmail.com/Databricks_MLOps/data"
+full_data_dir_path = "../data"
 
 data_filepath = f"{full_data_dir_path}/{csv_data_filename}"
 pd_df = pd.read_csv(data_filepath)
