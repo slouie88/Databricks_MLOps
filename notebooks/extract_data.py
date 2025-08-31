@@ -1,6 +1,12 @@
 # Databricks notebook source
-# MAGIC %pip install -e ..
-# MAGIC %restart_python
+# %pip install -e ..
+# %restart_python
+
+# COMMAND ----------
+
+# from pathlib import Path
+# import sys
+# sys.path.append(str(Path.cwd().parent / 'src'))
 
 # COMMAND ----------
 
@@ -24,7 +30,9 @@ from credit_risk.data_extractor import DataExtractor
 # COMMAND ----------
 
 project_config_yml_filename = "project_config_credit_risk.yml" 
-config_path = f"Databricks_MLOps/{project_config_yml_filename}"
+full_config_dir_path = "/Workspace/Users/slouie16888@gmail.com/Databricks_MLOps"
+
+config_path = f"{full_config_dir_path}/{project_config_yml_filename}"
 config = Config.from_yaml(config_path=config_path, env="dev")
 
 logger.info("Configuration loaded:")
@@ -39,8 +47,11 @@ logger.info(yaml.dump(config, default_flow_style=False))
 
 # Load the source csv ataset
 spark = SparkSession.builder.getOrCreate()
+
 csv_data_filename = "german_credit_data.csv"
-data_filepath = f"Databricks_MLOps/data/{csv_data_filename}"
+full_data_dir_path = "/Workspace/Users/slouie16888@gmail.com/Databricks_MLOps/data"
+
+data_filepath = f"{full_data_dir_path}/{csv_data_filename}"
 pd_df = pd.read_csv(data_filepath)
 logger.info("Source csv data loaded for processing.")
 
