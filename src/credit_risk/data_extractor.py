@@ -66,7 +66,7 @@ class DataExtractor:
             .withColumn("Checking_account", F.when(F.col("Checking_account") == "NA", F.lit(None)).otherwise(F.col("Checking_account")))
         
         # Fill nulls in Saving accounts and Checking account columns with "no account/unknown" category
-        spark_df = spark_df.fillna("no account/unknown", subset=["Saving accounts", "Checking account"])
+        spark_df = spark_df.fillna("no account/unknown", subset=["Saving_accounts", "Checking_account"])
 
         # Reduce cardinality of Housing and Purpose categories
         spark_df = spark_df.withColumn("Housing", F.when((F.col("Housing") == "free") | (F.col("Housing") == "rent"), "non-own").otherwise(F.col("Housing"))) \
