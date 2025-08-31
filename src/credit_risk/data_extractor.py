@@ -52,7 +52,7 @@ class DataExtractor:
         return df
 
 
-    def initial_feature_preprocessing(self, spark_df) -> pyspark.sql.DataFrame:
+    def initial_feature_preprocessing(self, spark_df: pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """Initial generation of features using custom logic before writing to Unity Catalog Feature Table.
 
         Other standard feature engineering steps that may be required, i.e. one-hot-encoding, scaling, etc. should be done as part of model pipeline.
@@ -94,9 +94,7 @@ class DataExtractor:
 
 
     def extract_to_feature_table(self) -> None:
-        """Extract data from the source dataset and write to Unity Catalog Feature Table.
-
-        """
+        """Extract data from the source dataset and write to Unity Catalog Feature Table."""
         # Convert to Spark DataFrame and perform initial feature preprocessing
         self.preprocess_column_names()
         spark_df = self.spark.createDataFrame(self.pd_df)
