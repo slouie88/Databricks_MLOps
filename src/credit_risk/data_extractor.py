@@ -11,20 +11,28 @@ class DataExtractor:
 
     def __init__(
         self,
+        pd_df: pd.DataFrame,
         config: Config,
         spark: SparkSession,
     ) -> None:
+        self.pd_df = pd_df
         self.config = config
         self.spark = spark
 
 
-    def extract_to_feature_table(self, pd_df: pd.DataFrame) -> None:
+    def preprocess_column_names(self) -> None:
+        """Preprocess column names to remove special characters and spaces."""
+        self.pd_df.columns = self.pd_df.columns.str.replace(r"[^a-zA-Z0-9]", "", regex=True)
+        self.pd_df.columns = self.pd_df.columns.str.replace(r"\s+", "", regex=True)
+
+
+    def extract_to_feature_table(self) -> None:
         """Extract data from the source dataset and write to Unity Catalog Feature Table.
 
-        :param pd_df: Input pandas DataFrame to be written to feature table
         """
-        # Convert pandas DataFrame to Spark DataFrame
-        spark_df = self.spark.createDataFrame(pd_df)
+        # Preprocess pandas DataFrame column names and convert to Spark DataFrame
+        self.preprocess_column_names()
+        spark_df = self.spark.createDataFrame(self.pd_df)
 
         # Write to Unity Catalog Feature Table using Databricks
         # Create the table if it doesn't exist, otherwise, replace existing table

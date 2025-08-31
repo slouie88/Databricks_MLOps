@@ -1,4 +1,10 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ### DISCLAIMER
+# MAGIC These notebooks were written for quick experimentation in Databricks. These Databricks Notebooks should be run in a Databricks workspace, corresponding dir path and file name variables may need to be changed according to your own needs.
+
+# COMMAND ----------
+
 # %pip install -e ..
 # %restart_python
 
@@ -45,7 +51,7 @@ logger.info(yaml.dump(config, default_flow_style=False))
 
 # COMMAND ----------
 
-# Load the source csv ataset
+# Load the source csv dataset
 spark = SparkSession.builder.getOrCreate()
 
 csv_data_filename = "german_credit_data.csv"
@@ -56,7 +62,7 @@ pd_df = pd.read_csv(data_filepath)
 logger.info("Source csv data loaded for processing.")
 
 # Initialize DataExtractor
-data_extractor = DataExtractor(config, spark)
+data_extractor = DataExtractor(pd_df, config, spark)
 
 # Preprocess the data
 data_extractor.extract_to_feature_table(pd_df)
