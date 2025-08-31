@@ -5,14 +5,14 @@
 
 # COMMAND ----------
 
-# %pip install -e ..
-# %restart_python
+# MAGIC %pip install -e ..
+# MAGIC %restart_python
 
 # COMMAND ----------
 
-# from pathlib import Path
-# import sys
-# sys.path.append(str(Path.cwd().parent / 'src'))
+from pathlib import Path
+import sys
+sys.path.append(str(Path.cwd().parent / 'src'))
 
 # COMMAND ----------
 
@@ -65,5 +65,5 @@ logger.info("Source csv data loaded for processing.")
 data_extractor = DataExtractor(pd_df, config, spark)
 
 # Preprocess the data
-data_extractor.extract_to_feature_table(pd_df)
+data_extractor.extract_to_feature_table()
 logger.info("Data extracted to Unity Catalog feature table.")

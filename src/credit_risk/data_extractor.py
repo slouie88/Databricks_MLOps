@@ -5,7 +5,6 @@ from pyspark.sql import SparkSession
 from credit_risk.config import Config
 
 
-
 class DataExtractor:
     """Class for extracting data from source datasets in the `data` directory and writing them to Unity Catalog tables."""
 
