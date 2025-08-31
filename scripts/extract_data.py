@@ -43,5 +43,5 @@ logger.info("Source csv data loaded for processing.")
 data_extractor = DataExtractor(config, spark)
 
 # Preprocess the data
-data_extractor.extract_to_feature_table(pd_df)
+data_extractor.extract_to_feature_table()
 logger.info("Data extracted to Unity Catalog feature table.")
