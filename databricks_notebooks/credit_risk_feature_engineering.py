@@ -8,7 +8,7 @@ from pyspark.ml.feature import StringIndexer, OneHotEncoder, Bucketizer, Standar
 from pyspark.sql import SparkSession
 from pyspark.sql.types import DoubleType
 import mlflow
-from databricks.feature_engineering import FeatureEngineeringClient, FeatureLookup
+# from databricks.feature_engineering import FeatureEngineeringClient, FeatureLookup
 
 mlflow.autolog(disable=True)
 spark = SparkSession.builder.getOrCreate()
@@ -23,7 +23,7 @@ spark = SparkSession.builder.getOrCreate()
 credit_df = spark.sql(
     """
     SELECT *
-    FROM scb_wh_dev.scratch_dev.raw_credit_info;
+    FROM mlops_dev.credit_risk.credit_risk_features;
     """
 )\
     .withColumn("Saving accounts", F.when(F.col("Saving accounts") == "NA", F.lit(None)).otherwise(F.col("Saving accounts"))) \
@@ -250,60 +250,3 @@ credit_risk_features = credit_df.select(*features).withColumn("id", F.monotonica
 credit_risk_features = credit_risk_features.select([F.col(col).alias(col.replace(' ', '_')) \
     for col in credit_risk_features.columns])
 credit_risk_features.show(10)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ##### With FeatureEngineering Client
-
-# COMMAND ----------
-
-fe = FeatureEngineeringClient()
-
-fe.create_table(
-    name="scratch_dev.credit_risk_features", 
-    primary_keys=["id"],
-    # df=credit_risk_features, 
-    schema=credit_risk_features.schema,
-    description="Credit Risk Features"
-)
-
-# COMMAND ----------
-
-fe.write_table(
-    name="scratch_dev.credit_risk_features", 
-    df=credit_risk_features, 
-    mode="merge"
-)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ##### With Databricks SQL
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC CREATE TABLE IF NOT EXISTS scratch_dev.credit_risk_features(
-# MAGIC   id INT NOT NULL,
-# MAGIC   Age_bucket FLOAT,
-# MAGIC   Credit_amount INT,
-# MAGIC   Duration INT,
-# MAGIC   Job INT,
-# MAGIC   Sex_enc FLOAT,
-# MAGIC   Housing_enc FLOAT,
-# MAGIC   Saving_accounts_enc FLOAT,
-# MAGIC   Checking_account_enc FLOAT,
-# MAGIC   Purpose STRING,
-# MAGIC   Risk STRING,
-# MAGIC   CONSTRAINT credit_risk_features_pk PRIMARY KEY (id)
-# MAGIC )
-
-# COMMAND ----------
-
-fe.write_table(
-    name="scratch_dev.credit_risk_features", 
-    df=credit_risk_features, 
-    mode="merge"
-)
-# Or can create a temporary view with the features spark df and write an upsert SQL statement with it (but am too lazy to write).

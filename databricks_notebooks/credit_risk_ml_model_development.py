@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, Bucketizer, StandardScaler, VectorAssembler
-from databricks.feature_engineering import FeatureEngineeringClient, FeatureLookup
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
@@ -31,7 +30,7 @@ spark = SparkSession.builder.getOrCreate()
 
 fe = FeatureEngineeringClient()
 credit_risk_df = fe.read_table(
-  name="scb_wh_dev.scratch_dev.credit_risk_features"
+  name="mlops_dev.credit_risk.credit_risk_features"
 ).toPandas()
 display(credit_risk_df)
 

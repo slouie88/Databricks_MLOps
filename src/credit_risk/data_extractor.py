@@ -21,8 +21,13 @@ class DataExtractor:
 
     def preprocess_column_names(self) -> None:
         """Preprocess column names to remove special characters and spaces."""
-        self.pd_df.columns = self.pd_df.columns.str.replace(r"[^a-zA-Z0-9]", "", regex=True)
-        self.pd_df.columns = self.pd_df.columns.str.replace(r"\s+", "", regex=True)
+        self.pd_df.columns = self.pd_df.columns.str.replace(r"[^a-zA-Z0-9]", "_", regex=True)
+        self.pd_df.columns = self.pd_df.columns.str.replace(r"\s+", "_", regex=True)
+
+
+    def preprocess_features(self) -> None:
+        """Preprocess features in the pandas DataFrame."""
+        
 
 
     def extract_to_feature_table(self) -> None:
