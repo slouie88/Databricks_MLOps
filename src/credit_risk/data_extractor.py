@@ -27,7 +27,7 @@ class DataExtractor:
         spark_df = self.spark.createDataFrame(pd_df)
 
         # Write to Unity Catalog Feature Table using Databricks 
-        table_name = f"{self.config.catalog_name}.{self.config.schema_name}.credit_risk"
+        table_name = f"{self.config.catalog_name}.{self.config.schema_name}.credit_risk_features"
         spark_df.writeTo(table_name).createOrReplace()  # Create the table if it doesn't exist. Otherwise, replace existing table.
 
         # Enforce primary key constraint on id column to ensure table is a feature table in unity catalog
