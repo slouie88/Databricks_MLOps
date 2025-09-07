@@ -15,9 +15,20 @@ primary_keys:
 experiment_name_basic: /Shared/credit-risk-basic
 experiment_name_custom: /Shared/credit-risk-custom
 
-learning_parameters:
+hyperparameters:
   learning_rate: 0.01
   n_estimators: 1000
   max_depth: 6
 
 target: Risk
+numerical_features:
+  - Credit_amount
+  - Duration
+  - Age
+categorical_features:
+  - Sex
+  - Job
+  - Housing
+  - Purpose
+  - Saving_accounts_ordinal_enc
+  - Checking_account_ordinal_enc
