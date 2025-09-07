@@ -47,7 +47,7 @@ class DataExtractor:
                 df
                 .withColumn(outputCols[i], F.col(inputCols[i])) # Create duplicate of original col.
                 .replace(to_replace=ordinal_dicts[i], subset=[outputCols[i]])   # Map to ordered values.
-                .withColumn(outputCols[i], F.col(outputCols[i]).cast("double")) # Cast to numerical.
+                .withColumn(outputCols[i], F.col(outputCols[i]).cast("integer")) # Cast to numerical.
             )
         return df
 
@@ -89,6 +89,14 @@ class DataExtractor:
         inputCols = ["Saving_accounts", "Checking_account"]
         outputCols = ["Saving_accounts_ordinal_enc", "Checking_account_ordinal_enc"]
         spark_df = self.ordinal_encode_cols(spark_df, inputCols, ordinal_dicts, outputCols)
+
+        # Label encoding for target column, good = 0, bad = 1
+        target_dict = {
+            "good": "0", 
+            "bad": "1"
+        }
+        spark_df = spark_df.replace(to_replace=target_dict, subset=["Risk"])
+        spark_df = spark_df.withColumn("Risk", F.col("Risk").cast("integer"))
 
         return spark_df
 
