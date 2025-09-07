@@ -74,16 +74,16 @@ class DataExtractor:
         
         # Ordinal encoding for Saving accounts and Checking account columns
         ordered_saving_accounts = {
-            "rich": "3",
-            "no account/unknown": "2",
-            "moderate": "1",
-            "little": "0"
+            "rich": 3,
+            "no account/unknown": 2,
+            "moderate": 1,
+            "little": 0
         }
         ordered_checking_accounts = {
-            "no account/unknown": "3",
-            "rich": "2",
-            "moderate": "1",
-            "little": "0"
+            "no account/unknown": 3,
+            "rich": 2,
+            "moderate": 1,
+            "little": 0
         }
         ordinal_dicts = [ordered_saving_accounts, ordered_checking_accounts]
         inputCols = ["Saving_accounts", "Checking_account"]
