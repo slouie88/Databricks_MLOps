@@ -1,7 +1,7 @@
 import mlflow
 import pandas as pd
-from delta.tables import DeltaTable
 from lightgbm import LGBMClassifier
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from loguru import logger
 from mlflow import MlflowClient
@@ -84,26 +84,78 @@ class BasicModel:
         """
         logger.info("🔄 Defining preprocessing pipeline...")
         
-        # Define preprocessing pipeline for numerical and categorical features
+        # Define preprocessing pipeline for numerical features
         numerical_transformer = Pipeline(
             steps=[("scaler", StandardScaler())]    # Scale numerical features for standardised scale.
         )
-        onehot_transformer = Pipeline(
-            steps=[("onehot_encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False))] # One-hot encode to handle multi-class categorical features.
-        )
-        categorical_transformer = Pipeline(
-            steps=[("label_encoder", LabelEncoder())]   # Label encode to handle binary categorical features.
-        )
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ("num", numerical_transformer, self.numerical_features),
-                ("cat_onehot", onehot_transformer, [col for col in self.categorical_features if self.X_train[col].nunique() > 2]),
-                ("cat_label", categorical_transformer, [col for col in self.categorical_features if self.X_train[col].nunique() == 2])
-            ],
-            remainder="drop"  # Drop any features not specified in the transformers.
-        )
 
-        # Define the overall model pipeline. Use Logistic Regression as baseline classifier, LightGBM for otherwise.
+        # Define preprocessing pipeline for categorical features
+        if self.is_baseline_model:
+            onehot_transformer = Pipeline(
+                steps=[("onehot_encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False))] # One-hot encode to handle multi-class categorical features.
+            )
+            categorical_transformer = Pipeline(
+                steps=[("label_encoder", LabelEncoder())]   # Label encode to handle binary categorical features.
+            )
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("num", numerical_transformer, self.numerical_features),
+                    ("cat_onehot", onehot_transformer, [col for col in self.categorical_features if self.X_train[col].nunique() > 2]),
+                    ("cat", categorical_transformer, [col for col in self.categorical_features if self.X_train[col].nunique() == 2])
+                ],
+                remainder="drop"  # Drop any features not specified in the transformers.
+            )
+        else:
+            class LGBMCategoricalTransformer(BaseEstimator, TransformerMixin):
+                """Transformer that encodes categorical columns as integer codes for LightGBM.
+
+                Unknown categories at transform time are encoded as -1.
+                """
+
+                def __init__(self, cat_features: list[str]) -> None:
+                    """Initialize the transformer with categorical feature names."""
+                    self.cat_features = cat_features
+                    self.cat_maps_ = {}
+
+
+                def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
+                    """Fit the transformer to the DataFrame X."""
+                    self.fit_transform(X)
+                    return self
+
+
+                def fit_transform(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+                    """Fit and transform the DataFrame X."""
+                    X = X.copy()
+
+                    for col in self.cat_features:
+                        c = pd.Categorical(X[col])
+                        self.cat_maps_[col] = dict(zip(c.categories, range(len(c.categories)), strict=False))
+                        X[col] = X[col].map(lambda val, col=col: self.cat_maps_[col].get(val, -1)).astype("category")
+
+                    return X
+
+
+                def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+                    """Transform the DataFrame X by encoding categorical features as integers."""
+                    X = X.copy()
+
+                    for col in self.cat_features:
+                        X[col] = X[col].map(lambda val, col=col: self.cat_maps_[col].get(val, -1)).astype("category")
+
+                    return X
+                
+            categorical_transformer = Pipeline(
+                steps=[("lgbm_cat_encoder", LGBMCategoricalTransformer(cat_features=self.categorical_features))]   # Encode categorical features for LightGBM.
+            )
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("num", numerical_transformer, self.numerical_features),
+                    ("cat", categorical_transformer, self.categorical_features)
+                ]
+            )
+
+        # Define the overall model pipeline - use Logistic Regression as baseline classifier, LightGBM for otherwise
         self.model = LogisticRegression(max_iter=1000) if self.is_baseline_model else LGBMClassifier(**self.hyperparameters)
         self.pipeline = Pipeline(steps=[("preprocessor", preprocessor), ("model", self.model)])
 
@@ -229,6 +281,7 @@ class BasicModel:
         """Evaluate the model performance on the test set.
 
         Compares the current model with the latest registered model using ROC AUC.
+
         :return: True if the current model performs better, False otherwise.
         """
         client = MlflowClient()
