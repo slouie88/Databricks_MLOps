@@ -59,12 +59,10 @@ class BasicModel:
         logger.info("🔄 Loading data from Databricks Delta tables...")
 
         credit_risk_features = self.spark.table(f"{self.catalog_name}.{self.schema_name}.credit_risk_features").toPandas()
-        self.train_set, self.test_set = train_test_split(credit_risk_features, test_size=0.2, random_state=42, stratify=credit_risk_features[self.target])
 
+        self.train_set, self.test_set = train_test_split(credit_risk_features, test_size=0.2, random_state=42, stratify=credit_risk_features[self.target])
         self.train_set_spark = self.spark.createDataFrame(self.train_set)
-        self.train_set_spark.createOrReplaceTempView("train_set")
         self.test_set_spark = self.spark.createDataFrame(self.test_set)
-        self.test_set_spark.createOrReplaceTempView("test_set")
 
         self.X_train = self.train_set[self.numerical_features + self.categorical_features]
         self.y_train = self.train_set[self.target]
@@ -72,10 +70,8 @@ class BasicModel:
         self.y_test = self.test_set[self.target]
         self.eval_data = self.test_set[self.numerical_features + self.categorical_features + [self.target]]
 
-        train_delta_table = DeltaTable.forName(self.spark, "train_set")
-        self.train_data_version = str(train_delta_table.history().select("version").first()[0])
-        test_delta_table = DeltaTable.forName(self.spark, "test_set")
-        self.test_data_version = str(test_delta_table.history().select("version").first()[0])
+        self.train_data_version = str(credit_risk_features.history().select("version").first()[0])
+        self.test_data_version = str(credit_risk_features.history().select("version").first()[0])
 
         logger.info("✅ Data successfully loaded.")
 
@@ -125,7 +121,7 @@ class BasicModel:
 
         mlflow.set_experiment(self.experiment_name)
         with mlflow.start_run(run_name=f"hyperparameter_tuning_{current_timestamp}", tags=self.tags) as run:
-            
+
             def objective(trial):
                 with mlflow.start_run(nested=True):
                     params = {
@@ -178,13 +174,13 @@ class BasicModel:
             signature = infer_signature(model_input=self.X_train, model_output=self.pipeline.predict(self.X_train))
             train_dataset = mlflow.data.from_spark(
                 self.train_set_spark,
-                table_name=f"{self.catalog_name}.{self.schema_name}.train_set",
+                table_name=f"{self.catalog_name}.{self.schema_name}.credit_risk_features",
                 version=self.train_data_version,
             )
             mlflow.log_input(train_dataset, context="training")
             test_dataset = mlflow.data.from_spark(
                 self.test_set_spark,
-                table_name=f"{self.catalog_name}.{self.schema_name}.test_set",
+                table_name=f"{self.catalog_name}.{self.schema_name}.credit_risk_features",
                 version=self.test_data_version,
             )
             mlflow.log_input(test_dataset, context="testing")
