@@ -17,8 +17,7 @@ experiment_name_custom: /Shared/credit-risk-custom
 
 hyperparameters:
   learning_rate: 0.01
-  n_estimators: 1000
-  max_depth: 6
+  n_estimators: 100
 
 target: Risk
 numerical_features:
