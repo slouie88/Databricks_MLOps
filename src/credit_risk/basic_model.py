@@ -11,6 +11,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from credit_risk.config import Config, Tags
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split, cross_val_score
+import optuna
 
 
 class BasicModel:
@@ -56,10 +58,13 @@ class BasicModel:
         """
         logger.info("🔄 Loading data from Databricks Delta tables...")
 
-        self.train_set_spark = self.spark.table(f"{self.catalog_name}.{self.schema_name}.train_set")
-        self.train_set = self.train_set_spark.toPandas()
-        self.test_set_spark = self.spark.table(f"{self.catalog_name}.{self.schema_name}.test_set")
-        self.test_set = self.test_set_spark.toPandas()
+        credit_risk_features = self.spark.table(f"{self.catalog_name}.{self.schema_name}.credit_risk_features").toPandas()
+        self.train_set, self.test_set = train_test_split(credit_risk_features, test_size=0.2, random_state=42, stratify=credit_risk_features[self.target])
+
+        self.train_set_spark = self.spark.createDataFrame(self.train_set)
+        self.train_set_spark.createOrReplaceTempView("train_set")
+        self.test_set_spark = self.spark.createDataFrame(self.test_set)
+        self.test_set_spark.createOrReplaceTempView("test_set")
 
         self.X_train = self.train_set[self.numerical_features + self.categorical_features]
         self.y_train = self.train_set[self.target]
@@ -67,9 +72,9 @@ class BasicModel:
         self.y_test = self.test_set[self.target]
         self.eval_data = self.test_set[self.numerical_features + self.categorical_features + [self.target]]
 
-        train_delta_table = DeltaTable.forName(self.spark, f"{self.catalog_name}.{self.schema_name}.train_set")
+        train_delta_table = DeltaTable.forName(self.spark, "train_set")
         self.train_data_version = str(train_delta_table.history().select("version").first()[0])
-        test_delta_table = DeltaTable.forName(self.spark, f"{self.catalog_name}.{self.schema_name}.test_set")
+        test_delta_table = DeltaTable.forName(self.spark, "test_set")
         self.test_data_version = str(test_delta_table.history().select("version").first()[0])
 
         logger.info("✅ Data successfully loaded.")
@@ -107,6 +112,52 @@ class BasicModel:
         self.pipeline = Pipeline(steps=[("preprocessor", preprocessor), ("model", self.model)])
 
         logger.info("✅ Preprocessing pipeline successfully defined.")
+
+
+    def tune_hyperparameters(self) -> None:
+        """Tune hyperparameters using bayesian optimisation with cross-validation.
+
+        Uses 5-fold cross-validation and TPE to find the best hyperparameters for the model.
+        """
+        logger.info("🔄 Starting hyperparameter tuning...")
+
+        current_timestamp = pd.Timestamp.now(tz="Australia/Brisbane").strftime("%Y%m%d_%H%M%S")
+
+        mlflow.set_experiment(self.experiment_name)
+        with mlflow.start_run(run_name=f"hyperparameter_tuning_{current_timestamp}", tags=self.tags) as run:
+            
+            def objective(trial):
+                with mlflow.start_run(nested=True):
+                    params = {
+                        "n_estimators": trial.suggest_int("n_estimators", 100, 500),
+                        "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.05, log=True),
+                        "max_depth": trial.suggest_int("max_depth", 1, 6),
+                        "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+                        "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 1.0)
+                    }
+
+                    model = LGBMClassifier(**params)
+                    pipeline = Pipeline(steps=[("preprocessor", self.pipeline.named_steps["preprocessor"]), ("model", model)])
+                    scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="roc_auc")
+                    cv_score = scores.mean()
+
+                    mlflow.log_params(params)
+                    mlflow.log_metric("roc_auc", cv_score)
+
+                    return cv_score
+                
+            study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler())
+            study.optimize(objective, n_trials=100)
+
+            best_params = study.best_params
+            self.hyperparameters.update(best_params)
+            self.model.set_params(**self.hyperparameters)
+            self.pipeline.named_steps["model"] = self.model
+
+            mlflow.log_params(best_params)
+            mlflow.log_metric("best_roc_auc", study.best_value)
+
+        logger.info(f"✅ Hyperparameter tuning completed.")
 
 
     def train(self) -> None:
