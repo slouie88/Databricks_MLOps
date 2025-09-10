@@ -12,8 +12,8 @@ primary_keys:
   - CustomerId
 
 
-experiment_name_basic: /Shared/credit-risk-basic
-experiment_name_custom: /Shared/credit-risk-custom
+experiment_name_model: /Shared/credit-risk-basic
+experiment_name_pyfunc_model: /Shared/credit-risk-custom
 
 hyperparameters:
   learning_rate: 0.01

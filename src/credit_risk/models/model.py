@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 import optuna
 
 
-class BasicModel:
+class Model:
     """A basic model class for Credit Risk Classification.
 
     This class handles data loading, feature preparation, model training, hyperparameter tuning, and MLflow logging.
@@ -46,8 +46,8 @@ class BasicModel:
         self.hyperparameters = self.config.hyperparameters
         self.catalog_name = self.config.catalog_name
         self.schema_name = self.config.schema_name
-        self.experiment_name = self.config.experiment_name_basic
-        self.model_name = f"{self.catalog_name}.{self.schema_name}.credit_risk_model_basic"
+        self.experiment_name = self.config.experiment_name_model
+        self.model_name = f"{self.catalog_name}.{self.schema_name}.credit-risk-model"
         self.tags = tags.to_dict()
 
 
@@ -56,7 +56,7 @@ class BasicModel:
 
         Splits data into features (X_train, X_test) and target (y_train, y_test).
         """
-        logger.info("🔄 Loading data from Databricks Delta tables...")
+        logger.info("Loading data from Databricks Delta tables...")
 
         credit_risk_features = self.spark.table(f"{self.catalog_name}.{self.schema_name}.credit_risk_features").toPandas()
 
@@ -73,7 +73,7 @@ class BasicModel:
         self.train_data_version = str(credit_risk_features.history().select("version").first()[0])
         self.test_data_version = str(credit_risk_features.history().select("version").first()[0])
 
-        logger.info("✅ Data successfully loaded.")
+        logger.info("Data successfully loaded.")
 
 
     def prepare_features(self) -> None:
@@ -82,7 +82,7 @@ class BasicModel:
         Creates a ColumnTransformer for one-hot encoding categorical features while passing through numerical
         features. Constructs a pipeline combining preprocessing and LightGBM classification model (or Logistic Regression for baseline model).
         """
-        logger.info("🔄 Defining preprocessing pipeline...")
+        logger.info("Defining preprocessing pipeline...")
         
         # Define preprocessing pipeline for numerical features
         numerical_transformer = Pipeline(
@@ -106,10 +106,10 @@ class BasicModel:
                 remainder="drop"  # Drop any features not specified in the transformers.
             )
         else:
-            class LGBMCategoricalTransformer(BaseEstimator, TransformerMixin):
+            class LGBMCategoricalTransformer(BaseEstimator, TransformerMixin):  # Define a custom transformer for LightGBM categorical encoding in a pipeline. Class defined within this method to keep model file self-contained.
                 """Transformer that encodes categorical columns as integer codes for LightGBM.
 
-                Unknown categories at transform time are encoded as -1.
+                Unknown categories at transform time are encoded as -1. Encoding integers as category type for LightGBM's internal handling of categorical features.
                 """
 
                 def __init__(self, cat_features: list[str]) -> None:
@@ -129,8 +129,8 @@ class BasicModel:
                     X = X.copy()
 
                     for col in self.cat_features:
-                        c = pd.Categorical(X[col])
-                        self.cat_maps_[col] = dict(zip(c.categories, range(len(c.categories)), strict=False))
+                        cat = pd.Categorical(X[col])
+                        self.cat_maps_[col] = dict(zip(cat.categories, range(len(cat.categories)), strict=False))
                         X[col] = X[col].map(lambda val, col=col: self.cat_maps_[col].get(val, -1)).astype("category")
 
                     return X
@@ -156,18 +156,18 @@ class BasicModel:
             )
 
         # Define the overall model pipeline - use Logistic Regression as baseline classifier, LightGBM for otherwise
-        self.model = LogisticRegression(max_iter=1000) if self.is_baseline_model else LGBMClassifier(**self.hyperparameters)
+        self.model = LogisticRegression(max_iter=1000) if self.is_baseline_model else LGBMClassifier(n_jobs=-1, **self.hyperparameters)
         self.pipeline = Pipeline(steps=[("preprocessor", preprocessor), ("model", self.model)])
 
-        logger.info("✅ Preprocessing pipeline successfully defined.")
+        logger.info("Preprocessing pipeline successfully defined.")
 
 
     def tune_hyperparameters(self) -> None:
         """Tune hyperparameters using bayesian optimisation with cross-validation.
 
-        Uses 5-fold cross-validation and TPE to find the best hyperparameters for the model.
+        Uses 5-fold cross-validation and TPE optimisation to find the best hyperparameters for the model.
         """
-        logger.info("🔄 Starting hyperparameter tuning...")
+        logger.info("Starting hyperparameter tuning...")
 
         current_timestamp = pd.Timestamp.now(tz="Australia/Brisbane").strftime("%Y%m%d_%H%M%S")
 
@@ -179,12 +179,12 @@ class BasicModel:
                     params = {
                         "n_estimators": trial.suggest_int("n_estimators", 100, 500),
                         "learning_rate": trial.suggest_float("learning_rate", 0.001, 0.05, log=True),
-                        "max_depth": trial.suggest_int("max_depth", 1, 6),
+                        "num_leaves": trial.suggest_int("num_leaves", 8, 256),
                         "subsample": trial.suggest_float("subsample", 0.5, 1.0),
                         "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 1.0)
                     }
 
-                    model = LGBMClassifier(**params)
+                    model = LGBMClassifier(n_jobs=-1, **params)
                     pipeline = Pipeline(steps=[("preprocessor", self.pipeline.named_steps["preprocessor"]), ("model", model)])
                     scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="roc_auc")
                     cv_score = scores.mean()
@@ -205,16 +205,48 @@ class BasicModel:
             mlflow.log_params(best_params)
             mlflow.log_metric("best_roc_auc", study.best_value)
 
-        logger.info(f"✅ Hyperparameter tuning completed.")
+        logger.info(f"Hyperparameter tuning completed.")
+
+
+    def get_hyperparameters_mlflow(self) -> dict:
+        """Fetch the best hyperparameters from the latest MLflow hyperparameter tuning run.
+
+        If no mlflow experiments or hyperparameter tuning runs are found, returns the default hyperparameters from the config.
+
+        :return best_params: Dictionary of best hyperparameters
+        """
+        client = MlflowClient()
+        experiment = client.get_experiment_by_name(self.experiment_name)
+        if experiment is None:
+            logger.info(f"Experiment '{self.experiment_name}' does not exist. Returning default hyperparameters from config.")
+            return self.hyperparameters
+
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id], 
+            filter_string="tags.mlflow.runName LIKE 'hyperparameter_tuning_%'", 
+            order_by=["metrics.best_roc_auc DESC"], 
+            max_results=1
+        )
+        if not runs:
+            logger.info(f"No hyperparameter tuning runs found in experiment '{self.experiment_name}'. Returning default hyperparameters from config.")
+            return self.hyperparameters
+
+        best_run = runs[0]
+        best_params = {key: value for key, value in best_run.data.params.items() if key in self.hyperparameters}
+
+        logger.info(f"Best hyperparameters fetched from MLflow run ID {best_run.info.run_id}: {best_params}")
+
+        return best_params
 
 
     def train(self) -> None:
         """Train the model."""
-        logger.info("🚀 Starting training...")
+        logger.info("Starting training...")
 
+        self.hyperparameters = self.get_hyperparameters_mlflow() if not self.is_baseline_model else self.hyperparameters
         self.pipeline.fit(self.X_train, self.y_train)
 
-        logger.info("✅ Training completed.")
+        logger.info("Training completed.")
 
 
     def log_model(self) -> None:
@@ -257,14 +289,14 @@ class BasicModel:
 
     def register_model(self) -> None:
         """Register model in Unity Catalog."""
-        logger.info("🔄 Registering the model in UC...")
+        logger.info("Registering the model in UC...")
 
         registered_model = mlflow.register_model(
             model_uri=f"runs:/{self.run_id}/credit-risk-model",
             name=self.model_name,
             tags=self.tags,
         )
-        logger.info(f"✅ Model registered as version {registered_model.version}.")
+        logger.info(f"Model registered as version {registered_model.version}.")
 
         latest_version = registered_model.version
 
