@@ -10,7 +10,7 @@ from pyspark.sql import SparkSession
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from credit_risk.config import Config, Tags
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from delta.tables import DeltaTable
 import optuna
@@ -97,7 +97,7 @@ class Model:
                 steps=[("onehot_encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False))] # One-hot encode to handle multi-class categorical features.
             )
             categorical_transformer = Pipeline(
-                steps=[("label_encoder", LabelEncoder())]   # Label encode to handle binary categorical features.
+                steps=[("ordinal_encoder", OrdinalEncoder())]   # Label encode to handle binary categorical features.
             )
             preprocessor = ColumnTransformer(
                 transformers=[
