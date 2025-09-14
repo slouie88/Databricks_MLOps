@@ -90,7 +90,7 @@ code_paths=[f"{root_path}/artifacts/.internal/credit_risk-{databricks_mlops_v}-p
 wrapper = ModelWrapper()
 latest_version = wrapper.log_register_model(wrapped_model_uri=f"{baseline_model.model_info.model_uri}",
                         pyfunc_model_name=pyfunc_model_name,
-                        experiment_name=config.experiment_name_custom,
+                        experiment_name=config.experiment_name_pyfunc_model,
                         input_example=baseline_model.X_test[0:1],
                         tags=tags,
                         code_paths=code_paths)
