@@ -14,7 +14,7 @@ class Config(BaseModel):
     catalog_name: str
     schema_name: str
     primary_keys: list[str]
-    learning_parameters: dict[str, Any]
+    hyperparameters: dict[str, Any]
     experiment_name_basic: str | None
     experiment_name_custom: str | None
 

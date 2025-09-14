@@ -73,7 +73,7 @@ baseline_model.prepare_features()
 baseline_model.train()
 logger.info("baseline model training completed.")
 
-# Train the baseline model
+# Log the baseline model
 baseline_model.log_model()
 
 # Evaluate baseline model
