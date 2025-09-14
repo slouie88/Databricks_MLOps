@@ -15,8 +15,8 @@ class Config(BaseModel):
     schema_name: str
     primary_keys: list[str]
     hyperparameters: dict[str, Any]
-    experiment_name_basic: str | None
-    experiment_name_custom: str | None
+    experiment_name_model: str | None
+    experiment_name_pyfunc_model: str | None
 
     @classmethod
     def from_yaml(cls, config_path: str, env: str = "dev") -> "Config":
