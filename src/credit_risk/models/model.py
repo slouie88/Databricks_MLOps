@@ -291,8 +291,9 @@ class Model:
         """Register model in Unity Catalog."""
         logger.info("Registering the model in UC...")
 
+        model_uri = f"runs:/{self.run_id}/credit-risk-baseline_model" if self.is_baseline_model else f"runs:/{self.run_id}/credit-risk-model"
         registered_model = mlflow.register_model(
-            model_uri=f"runs:/{self.run_id}/credit-risk-model",
+            model_uri=model_uri,
             name=self.model_name,
             tags=self.tags,
         )
