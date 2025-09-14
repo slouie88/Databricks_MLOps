@@ -10,6 +10,8 @@ class Config(BaseModel):
     Supports environment-specific configuration overrides.
     """
 
+    numerical_features: list[str]
+    categorical_features: list[str]
     target: str
     catalog_name: str
     schema_name: str
