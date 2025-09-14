@@ -70,6 +70,7 @@ class Model:
         self.y_test = self.test_set[self.target]
         self.eval_data = self.test_set[self.numerical_features + self.categorical_features + [self.target]]
 
+        credit_risk_features = self.spark.table(f"{self.catalog_name}.{self.schema_name}.credit_risk_features")
         self.train_data_version = str(credit_risk_features.history().select("version").first()[0])
         self.test_data_version = str(credit_risk_features.history().select("version").first()[0])
 
