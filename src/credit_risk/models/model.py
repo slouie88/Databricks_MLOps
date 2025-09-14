@@ -12,6 +12,7 @@ from sklearn.pipeline import Pipeline
 from credit_risk.config import Config, Tags
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
+from delta.tables import DeltaTable
 import optuna
 
 
@@ -70,9 +71,9 @@ class Model:
         self.y_test = self.test_set[self.target]
         self.eval_data = self.test_set[self.numerical_features + self.categorical_features + [self.target]]
 
-        credit_risk_features = self.spark.table(f"{self.catalog_name}.{self.schema_name}.credit_risk_features")
-        self.train_data_version = str(credit_risk_features.history().select("version").first()[0])
-        self.test_data_version = str(credit_risk_features.history().select("version").first()[0])
+        credit_risk_features_delta_table = DeltaTable.forName(self.spark, f"{self.catalog_name}.{self.schema_name}.credit_risk_features")
+        self.train_data_version = str(credit_risk_features_delta_table.history().select("version").first()[0])
+        self.test_data_version = str(credit_risk_features_delta_table.history().select("version").first()[0])
 
         logger.info("Data successfully loaded.")
 
