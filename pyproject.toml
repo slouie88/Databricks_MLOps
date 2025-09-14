@@ -1,5 +1,5 @@
 [project]
-name = "databricks-mlops"
+name = "credit-risk"
 description = "End-to-end MLOps on Databricks Free edition."
 requires-python = ">=3.12, <3.13"
 dependencies = [
