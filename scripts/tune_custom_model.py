@@ -2,10 +2,8 @@ import argparse
 from loguru import logger
 from pyspark.dbutils import DBUtils
 from pyspark.sql import SparkSession
-from importlib.metadata import version
 from credit_risk.config import Config, Tags
 from credit_risk.models.model import Model
-from credit_risk.models.model_wrapper import ModelWrapper
 from dotenv import load_dotenv
 import mlflow
 import os
@@ -63,35 +61,5 @@ logger.info("data loaded.")
 # Prepare credit risk features
 lgbm_model.prepare_features()
 
-# Train the lightgbm model
-lgbm_model.train()
-logger.info("model training completed.")
-
-# Log the lightgbm model
-lgbm_model.log_model()
-
-# Evaluate lightgbm model
-model_improved = lgbm_model.model_improved()
-logger.info("model evaluation completed, model improved: %s", model_improved)
-
-if model_improved:
-    # Register the model
-    lgbm_model.register_model()
-    databricks_mlops_v = version("credit_risk")
-
-    pyfunc_model_name = f"{config.catalog_name}.{config.schema_name}.lgbm_model"
-    code_paths=[f"{root_path}/artifacts/.internal/credit_risk-{databricks_mlops_v}-py3-none-any.whl"]
-
-    wrapper = ModelWrapper()
-    latest_version = wrapper.log_register_model(wrapped_model_uri=f"{lgbm_model.model_info.model_uri}",
-                            pyfunc_model_name=pyfunc_model_name,
-                            experiment_name=config.experiment_name_pyfunc_model,
-                            input_example=lgbm_model.X_test[0:1],
-                            tags=tags,
-                            code_paths=code_paths)
-
-    logger.info("New model registered with version:", latest_version)
-    dbutils.jobs.taskValues.set(key="model_version", value=latest_version)
-    dbutils.jobs.taskValues.set(key="model_updated", value=1)
-else:
-    dbutils.jobs.taskValues.set(key="model_updated", value=0)
+# Tune hyperparameters for lightgbm model
+lgbm_model.tune_hyperparameters()

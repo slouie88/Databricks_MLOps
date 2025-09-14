@@ -234,7 +234,7 @@ class Model:
             return self.hyperparameters
 
         best_run = runs[0]
-        best_params = {key: value for key, value in best_run.data.params.items() if key in self.hyperparameters}
+        best_params = {key: value for key, value in best_run.data.params.items()}
 
         logger.info(f"Best hyperparameters fetched from MLflow run ID {best_run.info.run_id}: {best_params}")
 
@@ -276,9 +276,12 @@ class Model:
                 signature=signature,
                 input_example=self.X_test[0:1],
             )
+
+            if not self.is_baseline_model:
+                mlflow.log_params(self.hyperparameters)
+
             eval_data = self.X_test.copy()
             eval_data[self.config.target] = self.y_test
-
             result = mlflow.models.evaluate(
                 self.model_info.model_uri,
                 eval_data,
