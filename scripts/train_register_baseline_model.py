@@ -76,10 +76,6 @@ logger.info("baseline model training completed.")
 # Log the baseline model
 baseline_model.log_model()
 
-# Evaluate baseline model
-model_improved = baseline_model.model_improved()
-logger.info("baseline model evaluation completed, model improved: %s", model_improved)
-
 # Register the model
 baseline_model.register_model()
 databricks_mlops_v = version("credit_risk")

@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC ### DISCLAIMER
-# MAGIC These notebooks were written for quick experimentation in Databricks. These Databricks Notebooks should be run in a Databricks workspace, corresponding dir path and file name variables may need to be changed according to your own needs.
+# MAGIC This notebook was written for quick experimentation in Databricks. This Databricks Notebook should be run in a Databricks workspace, corresponding dir path and file name variables may need to be changed according to your own needs.
 
 # COMMAND ----------
 

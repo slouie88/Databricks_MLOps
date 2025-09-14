@@ -1,8 +1,3 @@
-# Databricks notebook source
-# MAGIC %md
-# MAGIC ### DISCLAIMER
-# MAGIC These notebooks were written for quick experimentation in Databricks. These Databricks Notebooks should be run in a Databricks workspace, corresponding dir path and file name variables may need to be changed according to your own needs.
-
 # COMMAND ----------
 
 # MAGIC %pip install -e ..
@@ -10,9 +5,9 @@
 
 # COMMAND ----------
 
-from pathlib import Path
-import sys
-sys.path.append(str(Path.cwd().parent / 'src'))
+# from pathlib import Path
+# import sys
+# sys.path.append(str(Path.cwd().parent / 'src'))
 
 # COMMAND ----------
 
@@ -37,6 +32,14 @@ import os
 # MAGIC ### Configuration
 
 # COMMAND ----------
+def is_databricks():
+    return "DATABRICKS_RUNTIME_VERSION" in os.environ
+
+if not is_databricks():
+    load_dotenv()
+    profile = os.environ["PROFILE"]
+    mlflow.set_tracking_uri(f"databricks://{profile}")
+    mlflow.set_registry_uri(f"databricks-uc://{profile}")
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -79,7 +82,7 @@ baseline_model.log_model()
 
 # Register the model
 baseline_model.register_model()
-databricks_mlops_v = version("credit_risk")
+databricks_mlops_v = version("credit_risk") # If running locally, ensure you build the credit_risk package first with uv build in the project root directory.
 
 pyfunc_model_name = f"{config.catalog_name}.{config.schema_name}.baseline_model"
 code_paths=[f"../dist/credit_risk-{databricks_mlops_v}-py3-none-any.whl"]
