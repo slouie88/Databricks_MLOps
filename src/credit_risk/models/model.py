@@ -334,7 +334,7 @@ class Model:
             evaluators=["default"],
         )
         metrics_old = result.metrics
-        if self.metrics["roc_auc"] >= metrics_old["roc_auc"]:
+        if self.metrics["precision_recall_auc"] >= metrics_old["precision_recall_auc"]:
             logger.info("Current model performs better. Returning True.")
             return True
         else:
