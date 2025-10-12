@@ -1,13 +1,8 @@
-# COMMAND ----------
+# Databricks notebook source
+# MAGIC %pip install credit_risk-0.1.0-py3-none-any.whl
 
-# MAGIC %pip install -e ..
+# COMMAND ----------
 # MAGIC %restart_python
-
-# COMMAND ----------
-
-# from pathlib import Path
-# import sys
-# sys.path.append(str(Path.cwd().parent / 'src'))
 
 # COMMAND ----------
 import time
@@ -57,7 +52,8 @@ config = Config.from_yaml(config_path=config_path, env="dev")
 # COMMAND ----------
 # Initialize model serving
 model_serving = ModelServing(
-    model_name=f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model", endpoint_name="credit-risk-model-serving"
+    model_name=f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model", 
+    endpoint_name="credit-risk-model-serving"
 )
 
 # COMMAND ----------
