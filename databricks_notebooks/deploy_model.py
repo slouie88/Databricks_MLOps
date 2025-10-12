@@ -1,4 +1,15 @@
 # COMMAND ----------
+
+# MAGIC %pip install -e ..
+# MAGIC %restart_python
+
+# COMMAND ----------
+
+# from pathlib import Path
+# import sys
+# sys.path.append(str(Path.cwd().parent / 'src'))
+
+# COMMAND ----------
 import time
 import os
 import requests
@@ -9,6 +20,11 @@ from dotenv import load_dotenv
 from credit_risk.config import Config
 from credit_risk.endpoint_deployments.model_serving import ModelServing
 import numpy as np
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Configuration
 
 # COMMAND ----------
 # spark session
@@ -34,6 +50,11 @@ config_path = "../project_config_credit_risk.yml"
 config = Config.from_yaml(config_path=config_path, env="dev")
 
 # COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Create Model Serving Endpoint
+
+# COMMAND ----------
 # Initialize model serving
 model_serving = ModelServing(
     model_name=f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model", endpoint_name="credit-risk-model-serving"
@@ -42,6 +63,11 @@ model_serving = ModelServing(
 # COMMAND ----------
 # Deploy the model serving endpoint
 model_serving.deploy_or_update_serving_endpoint()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Test Model Serving Endpoint
 
 # COMMAND ----------
 # Create a sample request body
