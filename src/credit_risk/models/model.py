@@ -188,11 +188,11 @@ class Model:
 
                     model = LGBMClassifier(n_jobs=-1, **params)
                     pipeline = Pipeline(steps=[("preprocessor", self.pipeline.named_steps["preprocessor"]), ("model", model)])
-                    scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="precision_recall_auc")
+                    scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="average_precision")
                     cv_score = scores.mean()
 
                     mlflow.log_params(params)
-                    mlflow.log_metric("precision_recall_auc", cv_score)
+                    mlflow.log_metric("precision_recall_score", cv_score)
 
                     return cv_score
                 
@@ -205,7 +205,7 @@ class Model:
             self.pipeline.named_steps["model"] = self.model
 
             mlflow.log_params(best_params)
-            mlflow.log_metric("precision_recall_auc", study.best_value)
+            mlflow.log_metric("precision_recall_score", study.best_value)
 
         logger.info(f"Hyperparameter tuning completed.")
 
@@ -226,7 +226,7 @@ class Model:
         runs = client.search_runs(
             experiment_ids=[experiment.experiment_id], 
             filter_string="tags.mlflow.runName LIKE 'hyperparameter_tuning_%'", 
-            order_by=["metrics.precision_recall_auc DESC"], 
+            order_by=["metrics.precision_recall_score DESC"], 
             max_results=1
         )
         if not runs:
