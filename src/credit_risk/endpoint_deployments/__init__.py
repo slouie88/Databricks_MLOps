@@ -1,0 +1,1 @@
+"""Credit risk classification model endpoint deployments package."""
