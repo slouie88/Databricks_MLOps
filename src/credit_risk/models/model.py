@@ -188,11 +188,11 @@ class Model:
 
                     model = LGBMClassifier(n_jobs=-1, **params)
                     pipeline = Pipeline(steps=[("preprocessor", self.pipeline.named_steps["preprocessor"]), ("model", model)])
-                    scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="roc_auc")
+                    scores = cross_val_score(pipeline, self.X_train, self.y_train, cv=5, scoring="precision_recall_auc")
                     cv_score = scores.mean()
 
                     mlflow.log_params(params)
-                    mlflow.log_metric("roc_auc", cv_score)
+                    mlflow.log_metric("precision_recall_auc", cv_score)
 
                     return cv_score
                 
