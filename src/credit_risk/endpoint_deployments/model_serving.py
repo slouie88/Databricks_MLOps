@@ -1,11 +1,6 @@
-"""Model serving module for credit risk classification."""
-
 import mlflow
 from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.serving import (
-    EndpointCoreConfigInput,
-    ServedEntityInput,
-)
+from databricks.sdk.service.serving import EndpointCoreConfigInput, ServedEntityInput
 
 
 class ModelServing:
@@ -32,7 +27,7 @@ class ModelServing:
         :return: Latest version of the model as a string
         """
         client = mlflow.MlflowClient()
-        
+
         latest_version = client.get_model_version_by_alias(self.model_name, alias="latest-model").version
         print(f"Latest model version: {latest_version}")
 
