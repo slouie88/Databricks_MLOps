@@ -205,7 +205,7 @@ class Model:
             self.pipeline.named_steps["model"] = self.model
 
             mlflow.log_params(best_params)
-            mlflow.log_metric("best_roc_auc", study.best_value)
+            mlflow.log_metric("precision_recall_auc", study.best_value)
 
         logger.info(f"Hyperparameter tuning completed.")
 
@@ -226,7 +226,7 @@ class Model:
         runs = client.search_runs(
             experiment_ids=[experiment.experiment_id], 
             filter_string="tags.mlflow.runName LIKE 'hyperparameter_tuning_%'", 
-            order_by=["metrics.best_roc_auc DESC"], 
+            order_by=["metrics.precision_recall_auc DESC"], 
             max_results=1
         )
         if not runs:
