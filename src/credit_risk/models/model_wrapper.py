@@ -17,9 +17,6 @@ class ModelWrapper(mlflow.pyfunc.PythonModel):
 
     def load_context(self, context: PythonModelContext) -> None:
         """Load the model."""
-        # logger.info("Available artifact keys:", context.artifacts.keys())
-        # self.model = mlflow.sklearn.load_model(context.artifacts["credit-risk-model"])
-
         # Get path from artifacts (accept both keys)
         raw = context.artifacts.get("credit-risk-model") or context.artifacts.get("risk_model")
         if not raw:
@@ -56,7 +53,7 @@ class ModelWrapper(mlflow.pyfunc.PythonModel):
                 
         # Load using pyfunc (works regardless of underlying flavor)
         self.model = mlflow.pyfunc.load_model(p)
-        
+
     
     def predict(self, context: PythonModelContext, model_input: pd.DataFrame | np.ndarray):
         """Lazy-load model if necessary, then predict."""
