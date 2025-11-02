@@ -53,7 +53,7 @@ config = Config.from_yaml(config_path=config_path, env="dev")
 # Initialize model serving
 model_serving = ModelServing(
     model_name=f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model", 
-    endpoint_name="credit-risk-model-serving"
+    endpoint_name="credit-risk-model-serving-dev"
 )
 
 # COMMAND ----------
@@ -91,7 +91,7 @@ df_records = [[record] for record in sample_records]
 
 # COMMAND ----------
 # Call the endpoint with one sample record
-serving_endpoint = f"{os.environ['DBR_HOST']}/serving-endpoints/credit-risk-model-serving/invocations"    
+serving_endpoint = f"{os.environ['DBR_HOST']}/serving-endpoints/credit-risk-model-serving-dev/invocations"    
 print(f"Calling endpoint: {serving_endpoint}")
 
 response = requests.post(
