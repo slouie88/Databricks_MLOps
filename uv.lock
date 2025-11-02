@@ -313,6 +313,71 @@ wheels = [
 ]
 
 [[package]]
+name = "credit-risk"
+source = { editable = "." }
+dependencies = [
+    { name = "cffi" },
+    { name = "cloudpickle" },
+    { name = "databricks-feature-engineering" },
+    { name = "databricks-sdk" },
+    { name = "lightgbm" },
+    { name = "loguru" },
+    { name = "mlflow" },
+    { name = "numpy" },
+    { name = "optuna" },
+    { name = "pandas" },
+    { name = "psutil" },
+    { name = "pyarrow" },
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "databricks-connect" },
+    { name = "ipykernel" },
+    { name = "pip" },
+    { name = "pre-commit" },
+]
+test = [
+    { name = "pre-commit" },
+    { name = "pyspark" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cffi", specifier = ">=1.17.1" },
+    { name = "cloudpickle", specifier = ">=3.1.1" },
+    { name = "databricks-connect", marker = "extra == 'dev'", specifier = ">=16.0,<17" },
+    { name = "databricks-feature-engineering", specifier = ">=0.8.0" },
+    { name = "databricks-sdk", specifier = ">=0.55.0" },
+    { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29.5,<7" },
+    { name = "lightgbm", specifier = ">=4.6.0" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "mlflow", specifier = ">=3.1.1" },
+    { name = "numpy", specifier = ">=1.26.4" },
+    { name = "optuna" },
+    { name = "pandas", specifier = ">=2.3.0" },
+    { name = "pip", marker = "extra == 'dev'", specifier = ">=25.0.1,<26" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.1.0,<5" },
+    { name = "pre-commit", marker = "extra == 'test'", specifier = ">=4.1.0,<5" },
+    { name = "psutil", specifier = "==7.0.0" },
+    { name = "pyarrow", specifier = ">=17.0.0" },
+    { name = "pydantic", specifier = ">=2.11.7" },
+    { name = "pyspark", marker = "extra == 'test'", specifier = ">=3.4.0,<4" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0.0,<9" },
+    { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=5.0.0,<6" },
+    { name = "python-dotenv", specifier = ">=1.1.1" },
+    { name = "scikit-learn", specifier = ">=1.7.0" },
+    { name = "scipy", specifier = ">=1.16.0" },
+]
+provides-extras = ["dev", "test"]
+
+[[package]]
 name = "cryptography"
 version = "45.0.6"
 source = { registry = "https://pypi.org/simple" }
@@ -419,69 +484,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/82/8e/739a62895502e6a2b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b2/59/4873eeaa92e2df76af940da372cc4f81fecc1890cc7c2ef2e1e5e7ebf038/databricks_feature_engineering-0.12.1-py3-none-any.whl", hash = "sha256:534af623b008acc186ab0a25d7b619a9e12845496589443afacdb81fd3f11cba", size = 278603, upload-time = "2025-06-03T22:41:53.824Z" },
 ]
-
-[[package]]
-name = "databricks-mlops"
-source = { editable = "." }
-dependencies = [
-    { name = "cffi" },
-    { name = "cloudpickle" },
-    { name = "databricks-feature-engineering" },
-    { name = "databricks-sdk" },
-    { name = "lightgbm" },
-    { name = "loguru" },
-    { name = "mlflow" },
-    { name = "numpy" },
-    { name = "optuna" },
-    { name = "pandas" },
-    { name = "pyarrow" },
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "databricks-connect" },
-    { name = "ipykernel" },
-    { name = "pip" },
-    { name = "pre-commit" },
-]
-test = [
-    { name = "pre-commit" },
-    { name = "pyspark" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cffi", specifier = ">=1.17.1" },
-    { name = "cloudpickle", specifier = ">=3.1.1" },
-    { name = "databricks-connect", marker = "extra == 'dev'", specifier = ">=16.0,<17" },
-    { name = "databricks-feature-engineering", specifier = ">=0.8.0" },
-    { name = "databricks-sdk", specifier = ">=0.55.0" },
-    { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29.5,<7" },
-    { name = "lightgbm", specifier = ">=4.6.0" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "mlflow", specifier = ">=3.1.1" },
-    { name = "numpy", specifier = ">=1.26.4" },
-    { name = "optuna" },
-    { name = "pandas", specifier = ">=2.3.0" },
-    { name = "pip", marker = "extra == 'dev'", specifier = ">=25.0.1,<26" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.1.0,<5" },
-    { name = "pre-commit", marker = "extra == 'test'", specifier = ">=4.1.0,<5" },
-    { name = "pyarrow", specifier = ">=17.0.0" },
-    { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "pyspark", marker = "extra == 'test'", specifier = ">=3.4.0,<4" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0.0,<9" },
-    { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=5.0.0,<6" },
-    { name = "python-dotenv", specifier = ">=1.1.1" },
-    { name = "scikit-learn", specifier = ">=1.7.0" },
-    { name = "scipy", specifier = ">=1.16.0" },
-]
-provides-extras = ["dev", "test"]
 
 [[package]]
 name = "databricks-sdk"

@@ -83,6 +83,7 @@ if model_improved:
     # Register the model
     lgbm_model.register_model()
     databricks_mlops_v = version("credit_risk") # If running locally, ensure you build the credit_risk package first in the project root directory.
+    logger.info(f"Wrapped model uri: {lgbm_model.model_info.model_uri}")
 
     pyfunc_model_name = f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model"
     code_paths=[f"../dist/credit_risk-{databricks_mlops_v}-py3-none-any.whl"]

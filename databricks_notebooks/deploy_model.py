@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %pip install credit_risk-0.1.0-py3-none-any.whl
+# MAGIC %pip install ../dist/credit_risk-0.1.0-py3-none-any.whl
 
 # COMMAND ----------
 # MAGIC %restart_python
@@ -27,7 +27,7 @@ spark = SparkSession.builder.getOrCreate()
 
 w = WorkspaceClient()
 os.environ["DBR_HOST"] = w.config.host
-os.environ["DBR_TOKEN"] = w.tokens.create(lifetime_seconds=1200).token_value
+os.environ["DBR_TOKEN"] = w.tokens.create(lifetime_seconds=1800).token_value
 
 
 def is_databricks():
@@ -113,3 +113,5 @@ for i in range(len(df_records)):
     print(f"Response Status: {response.status_code}")
     print(f"Response Text: {response.text}")
     time.sleep(0.2) 
+
+# COMMAND ----------

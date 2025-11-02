@@ -272,7 +272,7 @@ class Model:
             mlflow.log_input(test_dataset, context="testing")
             self.model_info = mlflow.sklearn.log_model(
                 sk_model=self.pipeline,
-                artifact_path="credit-risk-model",
+                name="credit-risk-model",
                 signature=signature,
                 input_example=self.X_test[0:1],
             )
