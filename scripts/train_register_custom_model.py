@@ -79,7 +79,7 @@ if model_improved:
     lgbm_model.register_model()
     databricks_mlops_v = version("credit_risk")
 
-    pyfunc_model_name = f"{config.catalog_name}.{config.schema_name}.lgbm_model"
+    pyfunc_model_name = f"{config.catalog_name}.{config.schema_name}.pyfunc_credit_risk_model"
     code_paths=[f"{root_path}/artifacts/.internal/credit_risk-{databricks_mlops_v}-py3-none-any.whl"]
 
     wrapper = ModelWrapper()

@@ -70,7 +70,7 @@ class ModelWrapper(mlflow.pyfunc.PythonModel):
         tags: Tags,
         code_paths: list[str],
         input_example: pd.DataFrame,
-    ) -> None:
+    ):
         """
         Log and register the model.
 

@@ -40,7 +40,7 @@ pd_df = pd.read_csv(data_filepath)
 logger.info("Source csv data loaded for processing.")
 
 # Initialize DataExtractor
-data_extractor = DataExtractor(config, spark)
+data_extractor = DataExtractor(pd_df, config, spark)
 
 # Preprocess the data
 data_extractor.extract_to_feature_table()
