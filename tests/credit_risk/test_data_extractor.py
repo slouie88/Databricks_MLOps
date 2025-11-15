@@ -1,6 +1,13 @@
+import sys
+from pathlib import Path
 import pytest
 import pandas as pd
 from unittest.mock import Mock, MagicMock, patch
+
+# Add the src directory to the Python path if not already added
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+# Import project modules after path setup
 from credit_risk.data_extractor import DataExtractor
 from credit_risk.config import Config
 
