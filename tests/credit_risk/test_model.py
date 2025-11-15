@@ -1,11 +1,18 @@
+import sys
+from pathlib import Path
 import types
 import pandas as pd
 import pytest
 from types import SimpleNamespace
-from credit_risk.models.model import Model
-from credit_risk.models import model as model_mod
 from sklearn.linear_model import LogisticRegression
 from lightgbm import LGBMClassifier
+
+# Add the src directory to the Python path if not already added
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+# Import project modules after path setup
+from credit_risk.models.model import Model
+from credit_risk.models import model as model_mod
 
 
 class DummyConfig:
