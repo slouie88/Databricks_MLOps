@@ -10,17 +10,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.12"]
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        # Fetch all history for all branches and tags
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
 
     - name: Git tag from version.txt
       run: |
