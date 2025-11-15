@@ -16,7 +16,6 @@ dependencies = [
     "pydantic>=2.11.7",
     "loguru>=0.7.3",
     "python-dotenv>=1.1.1",
-    "databricks-feature-engineering>=0.8.0",
     "optuna",
     "psutil==7.0.0",
 ]
@@ -32,7 +31,8 @@ dev = ["databricks-connect>=16.0, <17",
 test = ["pre-commit>=4.1.0, <5",
        "pytest>=8.0.0, <9",
        "pytest-cov>=5.0.0, <6",
-       "pyspark>=3.4.0, <4"]
+       "pyspark>=3.5.0, <4",
+       "delta-spark>=3.2.0, <3.3"]
 
 [build-system]
 requires = [
